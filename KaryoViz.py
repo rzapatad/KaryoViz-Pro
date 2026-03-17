@@ -7,7 +7,7 @@ import io, os, re, random
 # --- 1. CONFIGURACIÓN DE PÁGINA ---
 st.set_page_config(page_title="KaryoViz Pro - Richard Zapata", layout="wide", initial_sidebar_state="expanded")
 
-# --- 2. ESTILOS CSS ---
+# --- 2. ESTILOS CSS AVANZADOS ---
 st.markdown("""
     <style>
         .block-container { padding-top: 1rem; padding-bottom: 0rem; }
@@ -23,7 +23,7 @@ st.markdown("""
     <p class="pro-subtitle">Advanced Cytogenetic Mapping & Structural Visualization</p>
 """, unsafe_allow_html=True)
 
-# --- 3. GESTIÓN DE ESTADO ---
+# --- 3. GESTIÓN DE ESTADO Y CALLBACKS ---
 def cargar_demo():
     st.session_state["text_l_manual"] = (
         "chr1,start1,end1,chr2,start2,end2,color,fusion_gene\n"
@@ -40,10 +40,12 @@ def cargar_demo():
     )
     st.session_state["text_c_manual"] = (
         "chromosome,start,end,value\nchr7,0,159345973,1.0\nchr13,0,114364328,-1.0\nchr21,0,46709983,1.2\n"
-        "chr1,120000000,150000000,-0.8\nchr8,0,145138636,0.9\nchr18,0,80373285,-0.7\nchrX,0,156040895,1.5"
+        "chr1,120000000,150000000,-0.8\nchr8,0,145138636,0.9\nchr18,0,80373285,-0.7\nchrX,0,156040895,1.5\n"
+        "chr5,0,181538259,0.5\nchr17,35000000,40000000,1.1\nchr22,0,50818468,-0.9"
     )
     st.session_state["text_s_manual"] = (
-        "chromosome,start,value\nchr1,50000000,40\nchr17,20000000,95\nchr22,23000000,88\nchr2,29445000,100"
+        "chromosome,start,value\nchr1,50000000,40\nchr17,20000000,95\nchr22,23000000,88\nchr2,29445000,100\n"
+        "chr9,133500000,60\nchr11,60000000,45\nchr3,150000000,70\nchr14,105000000,55\nchr19,50000000,80\nchrX,100000000,65"
     )
 
 def nuevo_analisis():
@@ -67,16 +69,23 @@ with st.sidebar:
         c1, c2, c3 = st.columns(3)
         with c1: st.button("🧹 Nuevo", use_container_width=True, on_click=nuevo_analisis)
         with c2: st.button("🚀 Demo", type="primary", use_container_width=True, on_click=cargar_demo)
+        with c3:
+            temp_path = os.path.join(os.path.dirname(__file__), "Template.zip")
+            if os.path.exists(temp_path):
+                with open(temp_path, "rb") as f:
+                    st.download_button("📥 TEM", f, "Template.zip", use_container_width=True)
+            else:
+                st.button("📥 TEM", disabled=True)
         st.divider()
         with st.expander("🖼️ Ajustes Visuales", expanded=True):
             genome_ver = st.selectbox("Referencia", ["hg38", "hg19"])
             zoom_scale = st.slider("Canvas", 5, 20, 12)
             label_size = st.slider("Fuente (Chr)", 6, 16, 10)
             show_hotspots = st.checkbox("Heatmap Hotspots", value=True)
-            h_sens = st.slider("Sensibilidad", 1, 10, 5)
+            h_sens = st.slider("Sensibilidad Heatmap", 1, 10, 5)
         with st.expander("🔗 Links"):
             up_l_man = st.file_uploader("Subir CSV", type="csv", key=f"l_up_{st.session_state.file_uploader_key}")
-            st.text_area("Pegar Links", key="text_l_manual", height=80)
+            st.text_area("Pegar Links", key="text_l_manual", height=80, placeholder="chr1,start1,end1,chr2...")
             l_col_ui, l_wid = st.color_picker("Color Base", "#1f77b4"), st.slider("Grosor", 0.1, 5.0, 1.2)
             l_opa = st.slider("Opacidad", 0.1, 1.0, 0.6)
             f_cols = st.columns(2)
@@ -84,13 +93,13 @@ with st.sidebar:
             with f_cols[1]: tag_color = st.color_picker("Tag Color", "#D35400")
         with st.expander("📊 CNV"):
             up_c = st.file_uploader("Subir CSV", type="csv", key=f"c_up_{st.session_state.file_uploader_key}")
-            st.text_area("Pegar CNV", key="text_c_manual", height=80)
+            st.text_area("Pegar CNV", key="text_c_manual", height=80, placeholder="chromosome,start,end,value")
             c_cols = st.columns(2)
             with c_cols[0]: cp = st.color_picker("Ganancia", "#77DD77")
             with c_cols[1]: cn = st.color_picker("Pérdida", "#FF6961")
         with st.expander("📍 SNPs"):
             up_s = st.file_uploader("Subir CSV", type="csv", key=f"s_up_{st.session_state.file_uploader_key}")
-            st.text_area("Pegar SNPs", key="text_s_manual", height=80)
+            st.text_area("Pegar SNPs", key="text_s_manual", height=80, placeholder="chromosome,start,value")
             snp_col, snp_width_f = st.color_picker("Color SNP", "#0000FF"), st.slider("Grosor SNP", 50, 500, 200)
 
     with tabs[1]:
@@ -106,19 +115,19 @@ with st.sidebar:
             if st.button("🚀 Aplicar Demo"):
                 st.session_state.iscn_val = demo_opts[sel_demo]
                 st.rerun()
-        st.text_area("Cariotipos / Genes", height=150, key="iscn_val")
+        st.text_area("Cariotipos / Genes", height=150, key="iscn_val", placeholder="Ej: t(9;22)(q34;q11.2) o +8(q24)")
         up_iscn_p2 = st.file_uploader("Adjuntar lista (CSV)", type="csv", key=f"iscn_up_{st.session_state.file_uploader_key}")
         b1, b2 = st.columns(2)
         with b1: btn_proc = st.button("🚀 Procesar Fórmula", type="primary", use_container_width=True)
-        with b2: st.button("Limpiar", use_container_width=True, on_click=nuevo_analisis)
+        with b2: st.button("Limpiar Analizador", use_container_width=True, on_click=nuevo_analisis)
         if st.session_state.df_l_final is not None and not st.session_state.df_l_final.empty:
             st.subheader("🧬 Hallazgos Estructurales")
             st.session_state.df_l_final = st.data_editor(st.session_state.df_l_final, hide_index=True, key="ed_est")
         if st.session_state.df_c_final is not None and not st.session_state.df_c_final.empty:
-            st.subheader("📊 Hallazgos Numéricos (CNV)")
+            st.subheader("📊 Hallazgos Numéricos & CNV")
             st.session_state.df_c_final = st.data_editor(st.session_state.df_c_final, hide_index=True, key="ed_num")
 
-# --- 5. MOTOR DE PROCESAMIENTO ---
+# --- 5. MOTOR DE PROCESAMIENTO (RUTAS RELATIVAS) ---
 base_p = os.path.dirname(__file__)
 size_f = os.path.join(base_p, f"{genome_ver}.chrom.sizes.txt")
 band_f = os.path.join(base_p, f"{genome_ver}_cytoBand.txt")
@@ -156,8 +165,7 @@ def procesar_dual_logic(lista, df_bandas, df_tamanos, df_genes=None):
             elif tipo in ["T", "INV", "ROB", "R", "ISO"]:
                 if len(c_l) >= 1 and len(b_l) >= 2:
                     c1, c2 = f"chr{c_l[0]}", (f"chr{c_l[1]}" if len(c_l)>1 else f"chr{c_l[0]}")
-                    r1 = df_bandas[(df_bandas["chr"] == c1) & (df_bandas["band"].str.contains(b_l[0], case=False))].iloc[:1]
-                    r2 = df_bandas[(df_bandas["chr"] == c2) & (df_bandas["band"].str.contains(b_l[1], case=False))].iloc[:1]
+                    r1, r2 = df_bandas[(df_bandas["chr"] == c1) & (df_bandas["band"].str.contains(b_l[0], case=False))].iloc[:1], df_bandas[(df_bandas["chr"] == c2) & (df_bandas["band"].str.contains(b_l[1], case=False))].iloc[:1]
                     if not r1.empty and not r2.empty:
                         gn1, gn2 = find_best_gene(c1, r1.iloc[0]["start"], r1.iloc[0]["end"], df_genes), find_best_gene(c2, r2.iloc[0]["start"], r2.iloc[0]["end"], df_genes)
                         enlaces.append({"chr1": c1, "start1": r1.iloc[0]["start"], "end1": r1.iloc[0]["end"], "chr2": c2, "start2": r2.iloc[0]["start"], "end2": r2.iloc[0]["end"], "color": random.choice(["#5DADE2", "#A569BD"]), "fusion_gene": f"{gn1}::{gn2}" if gn1 else ""})
@@ -210,14 +218,13 @@ if os.path.exists(size_f) and os.path.exists(band_f):
     with lay1: show_links = st.toggle("Links", value=True)
     with lay2: show_cnv = st.toggle("CNV", value=True)
     with lay3: show_snp = st.toggle("SNPs", value=True)
-    with lay4: show_tags = st.toggle("Tags", value=True)
+    with lay4: show_tags = st.toggle("Etiquetas (Tags)", value=True) # OPCION RECUPERADA
 
-    gene_search = st.text_input("🔍 Localizar Gen (Ej: ALK, TP53, BCR):", "").upper().strip()
+    gene_search = st.text_input("🔍 Localizar Gen (Ej: ALK, TP53):", "").upper().strip()
 
     circos = Circos({r["chr"]: r["size"] for _, r in df_sz.iterrows()}, space=3)
     db_band_raw = pd.read_csv(band_f, sep="\t", header=None, names=["chr","start","end","band","gieStain"])
     gie_c = {"gneg":"#FFFFFF","gpos25":"#D9D9D9","gpos50":"#969696","gpos75":"#525252","gpos100":"#000000","acen":"#800000","stalk":"#707070"}
-
     df_genes_db = pd.read_csv(genes_db_f) if os.path.exists(genes_db_f) else None
 
     for sector in circos.sectors:
@@ -230,11 +237,10 @@ if os.path.exists(size_f) and os.path.exists(band_f):
         sector.text(sector.name.replace("chr", ""), r=92, size=label_size, fontweight='bold', color="#333")
         
         if gene_search and df_genes_db is not None:
-            found_gene = df_genes_db[(df_genes_db["geneSymbol"].str.upper() == gene_search) & (df_genes_db["chrom"] == sector.name)]
-            if not found_gene.empty:
-                g_pos = (found_gene.iloc[0]["Start"] + found_gene.iloc[0]["End"]) / 2
-                sector.add_track((77, 85)).rect(found_gene.iloc[0]["Start"], found_gene.iloc[0]["End"], color="red", ec="red", lw=2)
-                sector.text(gene_search, x=g_pos, r=105, size=label_size+2, color="red", fontweight='bold')
+            found = df_genes_db[(df_genes_db["geneSymbol"].str.upper() == gene_search) & (df_genes_db["chrom"] == sector.name)]
+            if not found.empty:
+                sector.add_track((77, 85)).rect(found.iloc[0]["Start"], found.iloc[0]["End"], color="red", ec="red", lw=2)
+                sector.text(gene_search, x=(found.iloc[0]["Start"]+found.iloc[0]["End"])/2, r=105, size=label_size+2, color="red", fontweight='bold')
 
         if show_cnv and not d_c.empty:
             d = d_c[d_c.iloc[:,0] == sector.name]
@@ -273,16 +279,16 @@ if os.path.exists(size_f) and os.path.exists(band_f):
     st.markdown("### 📚 Leyenda Citogenética")
     col_leg1, col_leg2, col_leg3 = st.columns(3)
     with col_leg1:
-        st.write("**Bandas (GIE Stains)**")
-        st.write("⚪ *gneg*: Claras"); st.write("🔘 *gpos*: Grises"); st.write("⚫ *gpos100*: Oscuras")
+        st.write("**Bandas**")
+        st.write("⚪ *gneg* / 🔘 *gpos* / ⚫ *gpos100*")
     with col_leg2:
         st.write("**Regiones**")
-        st.write("🔴 *acen*: Centrómero"); st.write("〰️ *stalk*: Satélites"); st.write("🔥 *Heatmap*: Hotspots")
+        st.write("🔴 *acen*: Centrómero / 🔥 *Heatmap*: Hotspots")
     with col_leg3:
-        st.write("**Marcas**")
-        st.write(f"🟩 *Gain*: {cp}"); st.write(f"🟥 *Loss*: {cn}"); st.write(f"🔵 *Links*: Fusiones")
+        st.write("**Hallazgos**")
+        st.write(f"🟩 Gain / 🟥 Loss / 🔵 Fusiones")
 
     buf = io.BytesIO(); fig.savefig(buf, format="png", dpi=300, transparent=True, bbox_inches='tight', pad_inches=0.4)
     st.download_button(label="📥 Guardar HQ PNG", data=buf.getvalue(), file_name="KaryoViz_HQ.png", mime="image/png", use_container_width=True)
 else:
-    st.error(f"Archivos de referencia faltantes.")
+    st.error("Error: Archivos de referencia no encontrados.")
