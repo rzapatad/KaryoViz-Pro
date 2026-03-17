@@ -5,7 +5,11 @@ import matplotlib.pyplot as plt
 import io, os, re, random
 
 # --- 1. CONFIGURACIÓN DE PÁGINA ---
-st.set_page_config(page_title="KaryoViz Pro - Richard Zapata", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(
+                   page_title="KaryoViz Pro - Richard Zapata", 
+                   layout="wide", 
+                   initial_sidebar_state="expanded"
+)
 
 # --- 2. ESTILOS CSS AVANZADOS ---
 st.markdown("""
