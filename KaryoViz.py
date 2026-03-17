@@ -127,6 +127,10 @@ with st.sidebar:
             st.subheader("📊 Hallazgos Numéricos & CNV")
             st.session_state.df_c_final = st.data_editor(st.session_state.df_c_final, hide_index=True, key="ed_num")
 
+ # --- FOOTER AUTOR ---
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("<p style='text-align: center; color: #888; font-size: 0.9em;'>Autor: Richard Junior Zapata Dongo</p>", unsafe_allow_html=True)
+    
 # --- 5. MOTOR DE PROCESAMIENTO (RUTAS RELATIVAS) ---
 base_p = os.path.dirname(__file__)
 size_f = os.path.join(base_p, f"{genome_ver}.chrom.sizes.txt")
