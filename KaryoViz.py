@@ -118,7 +118,7 @@ with st.sidebar:
             st.subheader("📊 Hallazgos Numéricos (CNV)")
             st.session_state.df_c_final = st.data_editor(st.session_state.df_c_final, hide_index=True, key="ed_num")
 
-# --- 5. MOTOR DE PROCESAMIENTO (RUTAS RELATIVAS) ---
+# --- 5. MOTOR DE PROCESAMIENTO ---
 base_p = os.path.dirname(__file__)
 size_f = os.path.join(base_p, f"{genome_ver}.chrom.sizes.txt")
 band_f = os.path.join(base_p, f"{genome_ver}_cytoBand.txt")
