@@ -136,7 +136,7 @@ with st.sidebar:
         st.header("📘 Manual de Usuario Pro")
         st.markdown("""
         ### 1. 📥 Carga de Datos (Data Entry)
-        Existen tres formas de alimentar al sistema:
+        Existen cuatro formas de alimentar al sistema:
         * **Demo:** Ejecuta los demos en la pestaña "Diseño & Data", o los 40 ejemplos demo clínicos que trae la pestaña "Analizador ISCN".
         * **Texto Manual:** Escriba o pega filas directamente en las cajas de la Pestaña "Diseño & Data". Use el formato CSV: `cromosoma,inicio,fin,valor`.
         * **Subida de Archivos:** Carga tus propios archivos `.csv` en los botones de "Subir CSV".  Puedes descarga las plantillas de los casos accionando el botón "TEM" (template).
