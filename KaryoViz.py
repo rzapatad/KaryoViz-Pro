@@ -134,28 +134,33 @@ with st.sidebar:
 
     with tabs[2]:
         st.header("📘 Manual de Usuario Pro")
-        st.info("KaryoViz Pro: Mapeo Avanzado y Visualización Estructural")
-        
-        st.markdown("### 1. 📥 Carga de Datos")
-        st.write("- **Manual:** Escriba directamente en las áreas de texto siguiendo el formato CSV sugerido en el 'placeholder'.")
-        st.write("- **CSV:** Suba archivos con encabezados específicos (ej: `chromosome,start,end,value`).")
-        st.write("- **ISCN:** Ingrese fórmulas citogenéticas clásicas en la pestaña del Analizador.")
+        st.markdown("""
+        ### 1. 📥 Carga de Datos (Data Entry)
+        Existen tres formas de alimentar al sistema:
+        * **Demo:** Ejecuta los demos en la pestaña "Diseño & Data", o los 40 ejemplos demo clínicos que trae la pestaña "Analizador ISCN".
+        * **Texto Manual:** Escriba o pega filas directamente en las cajas de la Pestaña "Diseño & Data". Use el formato CSV: `cromosoma,inicio,fin,valor`.
+        * **Subida de Archivos:** Carga tus propios archivos `.csv` en los botones de "Subir CSV".  Puedes descarga las plantillas de los casos accionando el botón "TEM" (template).
+        * **Fórmulas ISCN:** En la Pestaña "Analizador ISCN", escribe nomenclaturas clásicas como `t(9;22)(q34;q11.2)`, `del(13)(q14)` o incluso focales como `+8(q24)`. El motor extraerá las coordenadas automáticamente.
 
-        st.markdown("### 2. 🔍 Análisis ISCN")
-        st.write("El motor detecta automáticamente translocaciones `t(A;B)`, deleciones `del`, adiciones `add` y ganancias numéricas como `+8(q24)`.")
+        ### 2. 🔍 Analizador ISCN Dinámico (International System for Human Cytogenomic Nomenclature)
+        Este motor traduce nomenclatura citogenética a coordenadas genómicas exactas (basado en hg38/hg19):
+        * **Estructurales:** Reconoce `t(A;B)`, `inv(A)`, `dup(A)`, `del(A)`.
+        * **Numéricas Focales:** Si ingresa `+8(q24)`, el sistema busca la banda q24 en el cromosoma 8 y grafica la ganancia solo en esa región.
+        * **Moleculares:** Reconoce el formato de fusión de genes `GEN1::GEN2`.
 
-        st.markdown("### 3. 🎨 Modificación de Gráficas")
-        st.write("Ajuste el tamaño del **Canvas**, la fuente de los etiquetas y la **Sensibilidad del Heatmap** para resaltar regiones con alta densidad de rupturas.")
+        ### 3. 🎨 Modificación de Gráficas
+        Usa la sección **🖼️ Ajustes Visuales** para personalizar:
+        * **Canvas:** Aumenta o disminuye el tamaño general del plot.
+        * **Zoom Out:** El sistema deja un margen de seguridad para que los nombres de los cromosomas no se corten.
+        * **Sensibilidad:** Ajusta el brillo del Heatmap de Hotspots según la densidad de tus datos.
 
-        st.markdown("### 4. 🧬 Localización de Genes")
-        st.write("Use el buscador debajo de los filtros de capa para resaltar la ubicación exacta de un gen en el mapa genómico.")
+        ### 4. 🛠️ Control de Capas y Localización
+        * **Filtros (Toggles):** Activa o desactiva Links, CNVs, SNPs o Tags para limpiar la imagen antes de exportar.
+        * **🔍 Buscador de Genes:** Escriba un símbolo oficial (ej. `ALK`, `BCR`, `RUNX1T1`) en el cuadro de búsqueda para marcar su locus exacto con una señal roja.
 
-        st.markdown("### 5. 🛠️ Control de Capas")
-        st.write("Active o desactive los interruptores (Links, CNV, SNPs, Tags) para limpiar la visualización antes de exportar.")
-
-        # Botón para abrir manual detallado (simulado con expansión o link externo)
-        if st.button("📖 Abrir Manual Detallado"):
-            st.success("Manual desplegado en sección informativa.")
+        ### 5. 💾 Exportación Científica
+        Al finalizar, el botón **Guardar HQ PNG** genera un archivo de alta resolución (**300 DPI**) con fondo transparente, optimizada para su inserción directa en tu presentación y/o manuscritos.
+        """)
 
     # --- FOOTER AUTOR ---
     st.sidebar.markdown("---")
