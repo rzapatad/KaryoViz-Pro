@@ -68,7 +68,8 @@ CANCER_GENES = ["RUNX1", "RUNX1T1", "BCR", "ABL1", "PML", "RARA", "MYC", "IGH", 
 
 # --- 4. BARRA LATERAL ---
 with st.sidebar:
-    tabs = st.tabs(["🎨 Diseño & Data", "🔍 Analizador ISCN"])
+    tabs = st.tabs(["🎨 Diseño & Data", "🔍 Analizador ISCN", "📘 Manual"])
+    
     with tabs[0]:
         c1, c2, c3 = st.columns(3)
         with c1: st.button("🧹 Nuevo", use_container_width=True, on_click=nuevo_analisis)
@@ -131,10 +132,35 @@ with st.sidebar:
             st.subheader("📊 Hallazgos Numéricos & CNV")
             st.session_state.df_c_final = st.data_editor(st.session_state.df_c_final, hide_index=True, key="ed_num")
 
- # --- FOOTER AUTOR ---
+    with tabs[2]:
+        st.header("📘 Manual de Usuario Pro")
+        st.info("KaryoViz Pro: Mapeo Avanzado y Visualización Estructural")
+        
+        st.markdown("### 1. 📥 Carga de Datos")
+        st.write("- **Manual:** Escriba directamente en las áreas de texto siguiendo el formato CSV sugerido en el 'placeholder'.")
+        st.write("- **CSV:** Suba archivos con encabezados específicos (ej: `chromosome,start,end,value`).")
+        st.write("- **ISCN:** Ingrese fórmulas citogenéticas clásicas en la pestaña del Analizador.")
+
+        st.markdown("### 2. 🔍 Análisis ISCN")
+        st.write("El motor detecta automáticamente translocaciones `t(A;B)`, deleciones `del`, adiciones `add` y ganancias numéricas como `+8(q24)`.")
+
+        st.markdown("### 3. 🎨 Modificación de Gráficas")
+        st.write("Ajuste el tamaño del **Canvas**, la fuente de los etiquetas y la **Sensibilidad del Heatmap** para resaltar regiones con alta densidad de rupturas.")
+
+        st.markdown("### 4. 🧬 Localización de Genes")
+        st.write("Use el buscador debajo de los filtros de capa para resaltar la ubicación exacta de un gen en el mapa genómico.")
+
+        st.markdown("### 5. 🛠️ Control de Capas")
+        st.write("Active o desactive los interruptores (Links, CNV, SNPs, Tags) para limpiar la visualización antes de exportar.")
+
+        # Botón para abrir manual detallado (simulado con expansión o link externo)
+        if st.button("📖 Abrir Manual Detallado"):
+            st.success("Manual desplegado en sección informativa.")
+
+    # --- FOOTER AUTOR ---
     st.sidebar.markdown("---")
     st.sidebar.markdown("<p style='text-align: center; color: #888; font-size: 0.9em;'>Autor: Richard Junior Zapata Dongo</p>", unsafe_allow_html=True)
-    
+
 # --- 5. MOTOR DE PROCESAMIENTO (RUTAS RELATIVAS) ---
 base_p = os.path.dirname(__file__)
 size_f = os.path.join(base_p, f"{genome_ver}.chrom.sizes.txt")
@@ -226,7 +252,7 @@ if os.path.exists(size_f) and os.path.exists(band_f):
     with lay1: show_links = st.toggle("Links", value=True)
     with lay2: show_cnv = st.toggle("CNV", value=True)
     with lay3: show_snp = st.toggle("SNPs", value=True)
-    with lay4: show_tags = st.toggle("Etiquetas (Tags)", value=True) # OPCION RECUPERADA
+    with lay4: show_tags = st.toggle("Etiquetas (Tags)", value=True)
 
     gene_search = st.text_input("🔍 Localizar Gen (Ej: ALK, TP53):", "").upper().strip()
 
